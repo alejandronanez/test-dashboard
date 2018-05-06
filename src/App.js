@@ -46,12 +46,9 @@ class App extends Component {
   };
 
   updateTotals = () => {
-    this.setState(prevState => ({
-      failed: this.state.testSuite.failed.size,
-      passed: this.state.testSuite.passed.size,
-      total:
-        this.state.testSuite.failed.size + this.state.testSuite.passed.size,
-    }));
+    if (this.state.tests.length === this.state.total) {
+      this.setState({ finished: true });
+    }
   };
 
   individualUnitTest = (test, index) => {
@@ -77,6 +74,9 @@ class App extends Component {
             passed: passedTest,
             failed: failedTest,
           },
+          failed: failedTest.size,
+          passed: passedTest.size,
+          total: failedTest.size + passedTest.size,
         }),
         this.updateTotals
       );
@@ -114,14 +114,15 @@ class App extends Component {
   };
 
   render() {
-    const { failed, passed, total } = this.state;
+    const { failed, passed, total, finished } = this.state;
 
     return (
       <section>
         <h1>App</h1>
         <h2>Passed: {passed}</h2>
-        <h2>Failed: {passed}</h2>
+        <h2>Failed: {failed}</h2>
         <h2>Total: {total}</h2>
+        {finished && <h2>FINISHED!</h2>}
         <button onClick={this.handleStartTests}>Start tests</button>
         {this.renderTestGroup('notStarted')}
         {this.renderTestGroup('running')}
