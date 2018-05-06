@@ -21,6 +21,7 @@ class App extends Component {
         failed: new Map(),
       },
       finished: false,
+      running: false,
       passed: 0,
       failed: 0,
       total: 0,
@@ -47,7 +48,10 @@ class App extends Component {
 
   updateTotals = () => {
     if (this.state.tests.length === this.state.total) {
-      this.setState({ finished: true });
+      this.setState({
+        running: false,
+        finished: true,
+      });
     }
   };
 
@@ -95,6 +99,7 @@ class App extends Component {
 
     this.setState(
       prevState => ({
+        running: true,
         testSuite: {
           ...prevState.testSuite,
           notStarted: new Map(),
@@ -114,7 +119,7 @@ class App extends Component {
   };
 
   render() {
-    const { failed, passed, total, finished } = this.state;
+    const { failed, passed, total, finished, running } = this.state;
 
     return (
       <section>
@@ -123,7 +128,9 @@ class App extends Component {
         <h2>Failed: {failed}</h2>
         <h2>Total: {total}</h2>
         {finished && <h2>FINISHED!</h2>}
-        <button onClick={this.handleStartTests}>Start tests</button>
+        <button disabled={finished || running} onClick={this.handleStartTests}>
+          Start tests
+        </button>
         {this.renderTestGroup('notStarted')}
         {this.renderTestGroup('running')}
         {this.renderTestGroup('passed')}
