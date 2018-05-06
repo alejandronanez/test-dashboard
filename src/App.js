@@ -7,12 +7,12 @@ class App extends Component {
     super();
     this.state = {
       tests: [
-        { description: 'commas are rotated properly' },
-        { description: 'exclamation points stand up straight' },
-        { description: "run-on sentences don't run forever" },
-        { description: 'question marks curl down, not up' },
-        { description: 'semicolons are adequately waterproof' },
-        { description: 'capital letters can do yoga' },
+        { description: 'should be type safe' },
+        { description: 'should return a beautiful component' },
+        { description: 'should call the api with the right url' },
+        { description: 'should fetch more than one user' },
+        { description: 'should teach you the meaning of life' },
+        { description: 'should not call the backend' },
       ],
       testSuite: {
         notStarted: new Map(),
