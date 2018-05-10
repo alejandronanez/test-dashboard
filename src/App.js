@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import { generateDummyTest } from './utils';
+import Immutable from 'seamless-immutable';
 
 class App extends Component {
   constructor() {
@@ -14,12 +15,12 @@ class App extends Component {
         { description: 'should teach you the meaning of life' },
         { description: 'should not call the backend' },
       ],
-      testSuite: {
-        notStarted: new Map(),
-        running: new Map(),
-        passed: new Map(),
-        failed: new Map(),
-      },
+      testSuite: new Immutable({
+        notStarted: {},
+        running: {},
+        passed: {},
+        failed: {},
+      }),
       finished: false,
       running: false,
       passed: 0,
@@ -35,15 +36,9 @@ class App extends Component {
   getNotStartedTests = () => {
     const { tests, testSuite } = this.state;
 
-    const updatedTestSuite = tests.reduce(
-      (testMap, test, i) => ({
-        ...testMap,
-        notStarted: testMap.notStarted.set(`${i}`, test),
-      }),
-      testSuite
-    );
-
-    this.setState(() => ({ testSuite: updatedTestSuite }));
+    this.setState(() => ({
+      testSuite: Immutable.setIn(testSuite, ['notStarted'], tests)
+    }));
   };
 
   updateTotals = () => {
@@ -95,23 +90,20 @@ class App extends Component {
 
   handleStartTests = () => {
     const { testSuite } = this.state;
-    const running = testSuite.notStarted;
+    const removedStartedTests = Immutable.setIn(testSuite, ['notStarted'], {});
+    const newTestSuite = Immutable.setIn(removedStartedTests, ['running'], testSuite.notStarted);
 
     this.setState(
       prevState => ({
         running: true,
-        testSuite: {
-          ...prevState.testSuite,
-          notStarted: new Map(),
-          running,
-        },
+        testSuite: newTestSuite
       }),
       this.triggerTests
     );
   };
 
   renderTestGroup = testGroup => {
-    return Array.from(this.state.testSuite[testGroup].values()).map(test => (
+    return Array.from(this.state.testSuite[testGroup]).map(test => (
       <div key={test.description}>
         {testGroup} - {test.description}
       </div>
