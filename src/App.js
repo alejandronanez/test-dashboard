@@ -8,18 +8,18 @@ class App extends Component {
     super();
     this.state = {
       tests: [
-        { description: 'should be type safe' },
-        { description: 'should return a beautiful component' },
-        { description: 'should call the api with the right url' },
-        { description: 'should fetch more than one user' },
-        { description: 'should teach you the meaning of life' },
-        { description: 'should not call the backend' },
+        { description: 'should be type safe', run: generateDummyTest() },
+        { description: 'should return a beautiful component', run: generateDummyTest() },
+        { description: 'should call the api with the right url', run: generateDummyTest() },
+        { description: 'should fetch more than one user', run: generateDummyTest() },
+        { description: 'should teach you the meaning of life', run: generateDummyTest() },
+        { description: 'should not call the backend', run: generateDummyTest() },
       ],
       testSuite: new Immutable({
         notStarted: {},
-        running: {},
-        passed: {},
-        failed: {},
+        running: [],
+        passed: [],
+        failed: [],
       }),
       finished: false,
       running: false,
@@ -51,31 +51,24 @@ class App extends Component {
   };
 
   individualUnitTest = (test, index) => {
-    generateDummyTest()(testResult => {
+    test.run(testResult => {
       const { testSuite } = this.state;
-      const clonedPassedTest = new Map(testSuite.passed);
-      const clonedFailedTest = new Map(testSuite.failed);
-      const clonedRunningTest = new Map(testSuite.running);
+      const passedTest = testResult ? Immutable(testSuite.passed).concat(test) : testSuite.passed;
+      const failedTest = !testResult ? Immutable(testSuite.failed).concat(test) : testSuite.failed;
+      const runningTest = testSuite.running.filter(value => value.description !== test.description);
 
-      const passedTest = testResult
-        ? clonedPassedTest.set(index, test)
-        : clonedPassedTest;
-      const failedTest = !testResult
-        ? clonedFailedTest.set(index, test)
-        : clonedFailedTest;
-      clonedRunningTest.delete(index);
+      const updatedTestSuite = Immutable.merge(testSuite, {
+        passed: passedTest,
+        failed: failedTest,
+        running: runningTest,
+      });
 
       this.setState(
         prevState => ({
-          testSuite: {
-            ...prevState.testSuite,
-            running: clonedRunningTest,
-            passed: passedTest,
-            failed: failedTest,
-          },
-          failed: failedTest.size,
-          passed: passedTest.size,
-          total: failedTest.size + passedTest.size,
+          testSuite: updatedTestSuite,
+          failed: updatedTestSuite.failed.length,
+          passed: updatedTestSuite.passed.length,
+          total: updatedTestSuite.failed.length + updatedTestSuite.passed.length,
         }),
         this.updateTotals
       );
@@ -90,11 +83,11 @@ class App extends Component {
 
   handleStartTests = () => {
     const { testSuite } = this.state;
-    const removedStartedTests = Immutable.setIn(testSuite, ['notStarted'], {});
+    const removedStartedTests = Immutable.setIn(testSuite, ['notStarted'], []);
     const newTestSuite = Immutable.setIn(removedStartedTests, ['running'], testSuite.notStarted);
 
     this.setState(
-      prevState => ({
+      () => ({
         running: true,
         testSuite: newTestSuite
       }),
