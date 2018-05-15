@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import { generateDummyTest } from './utils';
+import { Test } from './Test';
 import Immutable from 'seamless-immutable';
 
 class App extends Component {
@@ -96,10 +97,8 @@ class App extends Component {
   };
 
   renderTestGroup = testGroup => {
-    return Array.from(this.state.testSuite[testGroup]).map(test => (
-      <div key={test.description}>
-        {testGroup} - {test.description}
-      </div>
+    return Array.from(this.state.testSuite[testGroup]).map((test, index) => (
+      <Test key={index} group={testGroup} description={test.description} />
     ));
   };
 
