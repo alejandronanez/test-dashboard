@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 
 const pallete = {
+  text: {
+    light: '#fff'
+  },
   tests: {
     passed: 'green',
     failed: 'red',
@@ -14,14 +17,17 @@ export const TestWrapper = styled.div`
   border-left: 5px solid ${(props) => pallete.tests[props.status] || pallete.tests.default}
   display: flex;
   flex-direction: row;
-  padding: 20px;
 `;
 
 export const TestStatus = styled.div`
-  color: ${(props) => pallete.tests[props.status] || pallete.tests.default}
+  background-color: ${(props) => pallete.tests[props.status] || pallete.tests.default}
+  color: ${pallete.text.light};
   font-weight: 700;
+  padding: 20px 0;
+  width: 120px;
 `;
 
 export const TestDescription = styled.div`
-  margin-left: 10px;
+  padding: 20px 20px 20px 0;
+  margin-left: 20px;
 `;
